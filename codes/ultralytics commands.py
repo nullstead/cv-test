@@ -9,25 +9,42 @@ Original file is located at
 
 !nvidia-smi
 
+
+
 !pip install roboflow
+
+
 
 from roboflow import Roboflow
 rf = Roboflow(api_key="rkI0UqLLPH0yVsl0y4Af")
 project = rf.workspace("yolo-0uujr").project("two-ingredients-test")
-version = project.version(1)
+version = project.version(2)
 dataset = version.download("yolov8")
+
+
 
 !pip install ultralytics
 
+
 from ultralytics import YOLO
+
+
 
 !rm -r /content/Two-Ingredients-Test-1
 
-!yolo detect train data=/content/Two-Ingredients-Test-1/data.yaml model=yolov8n.pt epochs=100 imgsz=640
 
-!yolo detect val model=/content/runs/detect/train/weights/best.pt data=/content/Two-Ingredients-Test-1/data.yaml
 
-!yolo detect predict model=/content/runs/detect/train/weights/best.pt source=/content/Two-Ingredients-Test-1/test/images
+!yolo detect train data=/content/Two-Ingredients-Test-2/data.yaml model=yolov8n.pt epochs=100 imgsz=640
+
+
+
+!yolo detect val model=/content/runs/detect/train/weights/best.pt data=/content/Two-Ingredients-Test-2/data.yaml
+
+
+
+!yolo detect predict model=/content/runs/detect/train/weights/best.pt source=/content/Two-Ingredients-Test-2/test/images
+
+
 
 import glob
 from IPython.display import Image, display
@@ -35,3 +52,7 @@ from IPython.display import Image, display
 for image_path in glob.glob(f'/content/runs/detect/predict/*.jpg'):
     display(Image(filename=image_path, height=600))
     print("\n")
+
+    
+
+project.version(dataset.version).deploy(model_type="yolov8", model_path=f'/content/runs/detect/train/')
